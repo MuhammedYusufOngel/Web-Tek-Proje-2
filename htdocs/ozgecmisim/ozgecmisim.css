@@ -1,0 +1,30 @@
+body {
+    background-color: white;
+    background-image: url("https://i.yeniankara.com.tr/2/1280/720/storage/old/d/news/108940.jpg");
+    background-repeat:no-repeat;
+    background-attachment:fixed;
+    background-size:cover;
+    background-position:center;
+
+}
+
+#btn_class {
+    color: rgb(241, 225, 225);
+    display: block;
+    margin-top: 100px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 40%;
+}
+
+#cv {
+    margin-top: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 450px;
+    height: 300px;
+}
+
+p, h3, h2{
+    color: rgb(241, 225, 225);
+}

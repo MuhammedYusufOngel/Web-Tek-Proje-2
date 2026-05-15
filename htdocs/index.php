@@ -30,9 +30,8 @@
         {?>
             <div class="alert alert-success" id="basarili" role="alert"><?= $mail_dogru_mesaj ?></div>
             <?php 
-            header('Refresh:2; Anasayfa/anasayfa.html');
+            header('Refresh:2; anasayfa');
         }
-
 
     }
 

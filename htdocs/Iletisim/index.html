@@ -1,0 +1,263 @@
+    <!DOCTYPE html>
+    <html lang="tr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Vue vs Saf JS Form Doğrulama</title>
+        <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+        
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
+        <style>
+            
+		body{
+            background-color: white;
+            background-image: url("https://i.yeniankara.com.tr/2/1280/720/storage/old/d/news/108940.jpg");
+            background-repeat:no-repeat;
+            background-attachment:fixed;
+            background-size:cover;
+            background-position:center;
+        }
+        
+        #btn_class {
+            color: black;
+            display: block;
+            margin-top: 100px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 40%;
+        }
+       
+        h1 {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+            
+            body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }
+            .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+            .form-group { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+            label { display: block; color: black; font-weight: bold; margin-bottom: 5px; }
+            input[type="text"], input[type="email"], input[type="tel"], select { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; color: black; border-radius: 4px; }
+            
+            /* Hata Mesajı Renkleri */
+            .error-vue { color: #e67e22; font-size: 0.85em; margin-top: 5px; display: block; font-weight: bold; }
+            .error-js { color: #e74c3c; font-size: 0.85em; margin-top: 5px; display: block; font-weight: bold; }
+            
+            /* Buton Stilleri */
+            .btn-container { display: flex; gap: 10px; margin-top: 20px; }
+            .btn-js { flex: 1; padding: 12px; background-color: #34495e; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 15px; }
+            .btn-js:hover { background-color: #2c3e50; }
+            .btn-vue { flex: 1; padding: 12px; background-color: #42b883; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 15px; }
+            .btn-vue:hover { background-color: #35495e; }
+        </style>
+        
+    </head>
+    <body>
+
+        
+    <div id="btn_class" class="container-fluid my-2 p-3" align="center">
+        <div class="row" align="center">
+                <div class="col-24 col-sm-12 col-md-12 col-lg-3"><button type="button" class="btn" onclick="location.href='/ozgecmisim'">Özgeçmişim</button></div> 
+                <div class="col-24 col-sm-12 col-md-12 col-lg-3"><button type="button" class="btn" onclick="location.href='/anasayfa'">Anasayfa</button></div> 
+                <div class="col-24 col-sm-12 col-md-12 col-lg-3"><button type="button" class="btn" onclick="location.href='/sehrim'">Şehrim</button></div> 
+                <div class="col-24 col-sm-12 col-md-12 col-lg-3"><button type="button" class="btn" onclick="location.href='/mirasimiz'">Mirasımız</button></div> 
+                <div class="col-24 col-sm-12 col-md-12 col-lg-3"><button type="button" class="btn" onclick="location.href='/takimimiz'">Takımımız</button></div> 
+                <div class="col-24 col-sm-12 col-md-12 col-lg-3"><button type="button" class="btn" onclick="location.href='/ilgialanlarim'">İlgi Alanlarım</button></div> 
+                <div class="col-24 col-sm-12 col-md-12 col-lg-3"><button type="button" class="btn" onclick="location.href='/Iletisim'">İletişim</button></div> 
+        </div>
+    </div>
+        
+    <div id="app" class="container">
+        <h2>Kayıt Formu</h2>
+        
+        <!-- Form action'ı PHP dosyasına yönlendirilmiş durumda -->
+        <form id="registerForm" action="form.php" method="POST">
+            
+            <!-- TEXT (Metin) -->
+            <div class="form-group">
+                <label for="fullname">Ad Soyad</label>
+                <!-- Vue için v-model, Saf JS için id kullanıyoruz -->
+                <input type="text" id="fullname" name="fullname" v-model="form.fullname">
+                <!-- Vue Hata Alanı -->
+                <span class="error-vue" v-if="vueErrors.fullname">Vue Hatası: {{ vueErrors.fullname }}</span>
+                <!-- Saf JS Hata Alanı -->
+                <span class="error-js" id="js-err-fullname"></span>
+            </div>
+
+            <!-- EMAIL -->
+            <div class="form-group">
+                <label for="email">E-posta</label>
+                <input type="email" id="email" name="email" v-model="form.email">
+                <span class="error-vue" v-if="vueErrors.email">Vue Hatası: {{ vueErrors.email }}</span>
+                <span class="error-js" id="js-err-email"></span>
+            </div>
+
+            <!-- TELEFON -->
+            <div class="form-group">
+                <label for="phone">Telefon Numarası</label>
+                <input type="tel" id="phone" name="phone" placeholder="05554443322" v-model="form.phone">
+                <span class="error-vue" v-if="vueErrors.phone">Vue Hatası: {{ vueErrors.phone }}</span>
+                <span class="error-js" id="js-err-phone"></span>
+            </div>
+
+            <!-- SELECT OPTION (Açılır Menü) -->
+            <div class="form-group">
+                <label for="city">Şehir</label>
+                <select id="city" name="city" v-model="form.city">
+                    <option value="">Lütfen seçiniz...</option>
+                    <option value="34">İstanbul</option>
+                    <option value="06">Ankara</option>
+                    <option value="35">İzmir</option>
+                </select>
+                <span class="error-vue" v-if="vueErrors.city">Vue Hatası: {{ vueErrors.city }}</span>
+                <span class="error-js" id="js-err-city"></span>
+            </div>
+
+            <!-- RADIO BUTTON -->
+            <div class="form-group">
+                <label>Cinsiyet</label>
+                <label style="font-weight: normal; display: inline-block; margin-right: 15px;">
+                    <input type="radio" name="gender" value="kadin" v-model="form.gender"> Kadın
+                </label>
+                <label style="font-weight: normal; display: inline-block;">
+                    <input type="radio" name="gender" value="erkek" v-model="form.gender"> Erkek
+                </label>
+                <span class="error-vue" v-if="vueErrors.gender" style="display:block;">Vue Hatası: {{ vueErrors.gender }}</span>
+                <span class="error-js" id="js-err-gender" style="display:block;"></span>
+            </div>
+
+            <!-- CHECKBOX -->
+            <div class="form-group">
+                <label style="font-weight: normal;">
+                    <input type="checkbox" id="terms" name="terms" v-model="form.terms">
+                    Kullanım koşullarını okudum ve kabul ediyorum.
+                </label>
+                <span class="error-vue" v-if="vueErrors.terms">Vue Hatası: {{ vueErrors.terms }}</span>
+                <span class="error-js" id="js-err-terms"></span>
+            </div>
+
+            <!-- BUTONLAR (type="button" yapılarak formun otomatik gönderimi durduruldu) -->
+            <div class="btn-container">
+                <!-- Saf JS Butonu (onclick ile doğrudan JS fonksiyonunu çağırır) -->
+                <button type="button" class="btn-js" onclick="validateWithVanillaJS()">Javascript ile Gönder</button>
+                
+                <!-- Vue.js Butonu (@click ile Vue içerisindeki metodu çağırır) -->
+                <button type="button" class="btn-vue" @click="validateWithVue">Vue.js İle Gönder</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- SCRIPT 1: VUE.JS DOĞRULAMASI -->
+    <script>
+        const { createApp, reactive } = Vue;
+
+        createApp({
+            setup() {
+                // Form verileri
+                const form = reactive({ fullname: '', email: '', phone: '', city: '', gender: '', terms: false });
+                // Vue Hata verileri
+                const vueErrors = reactive({ fullname: '', email: '', phone: '', city: '', gender: '', terms: '' });
+
+                const validateWithVue = () => {
+                    let isValid = true;
+
+                    // Önceki hataları temizle
+                    Object.keys(vueErrors).forEach(key => vueErrors[key] = '');
+
+                    // Kurallar
+                    if (!form.fullname.trim() || form.fullname.trim().length < 3) {
+                        vueErrors.fullname = 'Ad soyad en az 3 karakter olmalıdır.'; isValid = false;
+                    }
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(form.email)) {
+                        vueErrors.email = 'Geçerli bir e-posta adresi giriniz.'; isValid = false;
+                    }
+                    const phoneRegex = /^[0-9]{10,11}$/;
+                    if (!phoneRegex.test(form.phone)) {
+                        vueErrors.phone = '10-11 haneli geçerli bir numara giriniz.'; isValid = false;
+                    }
+                    if (!form.city) {
+                        vueErrors.city = 'Şehir seçimi zorunludur.'; isValid = false;
+                    }
+                    if (!form.gender) {
+                        vueErrors.gender = 'Cinsiyet seçimi zorunludur.'; isValid = false;
+                    }
+                    if (!form.terms) {
+                        vueErrors.terms = 'Koşulları kabul etmelisiniz.'; isValid = false;
+                    }
+
+                    if (isValid) {
+                        document.getElementById('registerForm').submit();
+                    }
+                };
+
+                return { form, vueErrors, validateWithVue };
+            }
+        }).mount('#app');
+    </script>
+
+    <!-- SCRIPT 2: SAF (VANILLA) JAVASCRIPT DOĞRULAMASI -->
+    <script>
+        function validateWithVanillaJS() {
+            let isValid = true;
+
+            // Saf JS ile hata alanlarını seç ve içini temizle
+            const errorSpans = document.querySelectorAll('.error-js');
+            errorSpans.forEach(span => span.innerText = '');
+
+            // 1. Text
+            const fullname = document.getElementById('fullname').value.trim();
+            if (!fullname || fullname.length < 3) {
+                document.getElementById('js-err-fullname').innerText = 'Javascript Hatası: Ad soyad en az 3 karakter olmalıdır.';
+                isValid = false;
+            }
+
+            // 2. Email
+            const email = document.getElementById('email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                document.getElementById('js-err-email').innerText = 'Javascript Hatası: Geçerli bir e-posta adresi giriniz.';
+                isValid = false;
+            }
+
+            // 3. Telefon
+            const phone = document.getElementById('phone').value.trim();
+            const phoneRegex = /^[0-9]{10,11}$/;
+            if (!phoneRegex.test(phone)) {
+                document.getElementById('js-err-phone').innerText = 'Javascript Hatası: 10-11 haneli geçerli bir numara giriniz.';
+                isValid = false;
+            }
+
+            // 4. Select Option
+            const city = document.getElementById('city').value;
+            if (!city) {
+                document.getElementById('js-err-city').innerText = 'Javascript Hatası: Şehir seçimi zorunludur.';
+                isValid = false;
+            }
+
+            // 5. Radio Button (Name özniteliği ile querySelector kullanarak seçiyoruz)
+            const gender = document.querySelector('input[name="gender"]:checked');
+            if (!gender) {
+                document.getElementById('js-err-gender').innerText = 'Javascript Hatası: Cinsiyet seçimi zorunludur.';
+                isValid = false;
+            }
+
+            // 6. Checkbox
+            const terms = document.getElementById('terms').checked;
+            if (!terms) {
+                document.getElementById('js-err-terms').innerText = 'Javascript Hatası: Koşulları kabul etmelisiniz.';
+                isValid = false;
+            }
+
+            // Her şey tamamsa formu Post et
+            if (isValid) {
+                document.getElementById('registerForm').submit();
+            }
+        }
+    </script>
+
+    </body>
+    </html>

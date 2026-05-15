@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=.6">
+        
+        <title>İlgi Alanlarım</title>
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
+        <link rel="stylesheet" href="./ilgialanlarim.css">
+</head>
+
+<body align="center">
+    <div id="btn_class" class="container-fluid my-2 p-3" align="center">
+        <div class="row" align="center">
+                <div class="col-24 col-sm-12 col-md-12 col-lg-3"><button type="button" class="btn" onclick="location.href='/ozgecmisim'">Özgeçmişim</button></div> 
+                <div class="col-24 col-sm-12 col-md-12 col-lg-3"><button type="button" class="btn" onclick="location.href='/anasayfa'">Anasayfa</button></div> 
+                <div class="col-24 col-sm-12 col-md-12 col-lg-3"><button type="button" class="btn" onclick="location.href='/sehrim'">Şehrim</button></div> 
+                <div class="col-24 col-sm-12 col-md-12 col-lg-3"><button type="button" class="btn" onclick="location.href='/mirasimiz'">Mirasımız</button></div> 
+                <div class="col-24 col-sm-12 col-md-12 col-lg-3"><button type="button" class="btn" onclick="location.href='/takimimiz'">Takımımız</button></div> 
+                <div class="col-24 col-sm-12 col-md-12 col-lg-3"><button type="button" class="btn" onclick="location.href='/ilgialanlarim'">İlgi Alanlarım</button></div> 
+                <div class="col-24 col-sm-12 col-md-12 col-lg-3"><button type="button" class="btn" onclick="location.href='/Iletisim'">İletişim</button></div> 
+        </div>
+            
+    </div>
+	<div class="col-24 col-sm-12 col-md-12 col-lg-3" id="baslik" align="center">
+	    <h2 class="tablo">Son MotoGP Haberleri</h2>
+	</div>
+
+	    <div id="haberler">
+        </div>
+
+    <script>
+        
+        const data = null;
+
+        const xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+
+        let title = []
+        let link = [] 
+        let imageUrl = []
+        let pubDate = []
+        let category = []
+
+        function formatRelativeTime(dateString) {
+            const targetDate = new Date(dateString);
+            const now = new Date();
+
+            // Aradaki farkı saniye cinsinden alalım
+            const secondsDiff = Math.floor((targetDate - now) / 1000);
+
+            // Zaman birimleri ve saniye karşılıkları
+            const units = [
+                { unit: 'year', seconds: 31536000 },
+                { unit: 'month', seconds: 2592000 },
+                { unit: 'day', seconds: 86400 },
+                { unit: 'hour', seconds: 3600 },
+                { unit: 'minute', seconds: 60 },
+                { unit: 'second', seconds: 1 }
+            ];
+
+            // Yerleşik JS nesnesini oluştur (Türkçe dil desteğiyle)
+            const rtf = new Intl.RelativeTimeFormat('tr', { numeric: 'always' });
+
+            for (const { unit, seconds } of units) {
+                if (Math.abs(secondsDiff) >= seconds || unit === 'second') {
+                    const value = Math.round(secondsDiff / seconds);
+                    return rtf.format(value, unit);
+                }
+            }
+        }
+
+        xhr.addEventListener('readystatechange', function () {
+            if (this.readyState === this.DONE) {
+                const json = JSON.parse(this.responseText);
+
+                if(Array.isArray(json.MotoGPNews)){
+                    json.MotoGPNews.forEach(item => {
+                        document.getElementById("haberler").innerHTML += `
+                            <div class="haber">
+                                <h2>${item.title}</h2>
+                                <img src="${item.imageURL}" alt="${item.title}" style="width:50%; height:auto;">
+                                <p>${formatRelativeTime(item.pubDate)}</p>
+                                <a href="${item.link}" target="_blank" class="btn-modern">Habere Git</a>
+                            </div>
+                        `;
+                    })
+                }
+            }
+        });
+
+        xhr.open('GET', 'https://motogp-news.p.rapidapi.com/motogpnews');
+        xhr.setRequestHeader('x-rapidapi-key', '54ea8c4953msh483f56f5517c49bp10082ejsnd7dec93d9097');
+        xhr.setRequestHeader('x-rapidapi-host', 'motogp-news.p.rapidapi.com');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        xhr.send(data);
+
+        
+        
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js" integrity="sha384-Y4oOpwW3duJdCWv5ly8SCFYWqFDsfob/3GkgExXKV4idmbt98QcxXYs9UoXAB7BZ" crossorigin="anonymous"></script>
+    
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>İletişim Formu - JavaScript ve Vue.js Doğrulama</title>
+
+    <!-- Vue.js CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: #42b883;
+            color: white;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:first-child {
+            background: #007bff;
+        }
+
+        button:first-child:hover {
+            background: #0056b3;
+        }
+
+        button:last-child:hover {
+            background: #369f6b;
+        }
+
+        .error {
+            color: red;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        .success {
+            margin-top: 20px;
+            padding: 10px;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app" class="container">
+    <h1>İletişim Formu</h1>
+
+    <div class="form-group">
+        <label>Ad Soyad</label>
+        <input type="text" id="adSoyad" v-model="adSoyad">
+        <div class="error" v-if="hatalar.adSoyad">{{ hatalar.adSoyad }}</div>
+    </div>
+
+    <div class="form-group">
+        <label>E-posta</label>
+        <input type="text" id="email" v-model="email">
+        <div class="error" v-if="hatalar.email">{{ hatalar.email }}</div>
+    </div>
+
+    <div class="form-group">
+        <label>Telefon</label>
+        <input type="text" id="telefon" v-model="telefon">
+        <div class="error" v-if="hatalar.telefon">{{ hatalar.telefon }}</div>
+    </div>
+
+    <div class="form-group">
+        <label>Mesaj</label>
+        <textarea id="mesaj" rows="4" v-model="mesaj"></textarea>
+        <div class="error" v-if="hatalar.mesaj">{{ hatalar.mesaj }}</div>
+    </div>
+
+    <div class="buttons">
+        <!-- Normal JavaScript ile doğrulama -->
+        <button type="button" onclick="javascriptIleDogrula()">
+            JavaScript ile Doğrula
+        </button>
+
+        <!-- Vue.js ile doğrulama -->
+        <button type="button" @click="vueIleDogrula">
+            Vue.js ile Doğrula
+        </button>
+    </div>
+
+    <div class="success" v-if="basarili">
+        Form başarıyla doğrulandı.
+    </div>
+</div>
+
+<script>
+/* ==========================
+   Normal JavaScript Kontrolü
+   ========================== */
+function javascriptIleDogrula() {
+    
+    const adSoyad = document.getElementById("adSoyad").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const telefon = document.getElementById("telefon").value.trim();
+    const mesaj = document.getElementById("mesaj").value.trim();
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const telefonRegex = /^[0-9]+$/;
+
+    let hataMesajlari = [];
+
+    if (adSoyad === "") {
+        hataMesajlari.push("Ad Soyad alanı boş bırakılamaz.");
+    }
+
+    if (email === "") {
+        hataMesajlari.push("E-posta alanı boş bırakılamaz.");
+    } else if (!emailRegex.test(email)) {
+        hataMesajlari.push("Geçerli bir e-posta adresi giriniz.");
+    }
+
+    if (telefon === "") {
+        hataMesajlari.push("Telefon alanı boş bırakılamaz.");
+    } else if (!telefonRegex.test(telefon)) {
+        hataMesajlari.push("Telefon sadece rakamlardan oluşmalıdır.");
+    }
+
+    if (mesaj === "") {
+        hataMesajlari.push("Mesaj alanı boş bırakılamaz.");
+    }
+
+    if (hataMesajlari.length > 0) {
+        alert("JavaScript Kontrol Sonucu:\n\n" + hataMesajlari.join("\n"));
+    } else {
+        alert("JavaScript Kontrol Sonucu:\n\nForm başarıyla doğrulandı.");
+
+        const data = {
+            adSoyad: adSoyad,
+            email: email,
+            telefon: telefon,
+            mesaj: mesaj
+        }
+        var request = new XMLHttpRequest();
+        request.open("POST", "form.php");
+        request.addEventListener('load', function(response) {
+            console.log(response.currentTarget.response);
+        });
+        request.send(data);
+    }
+}
+</script>
+
+<script>
+/* ==========================
+   Vue.js Kontrolü
+   ========================== */
+const { createApp } = Vue;
+
+createApp({
+    data() {
+        return {
+            adSoyad: '',
+            email: '',
+            telefon: '',
+            mesaj: '',
+            hatalar: {},
+            basarili: false
+        };
+    },
+    methods: {
+        vueIleDogrula() {
+            this.hatalar = {};
+            this.basarili = false;
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const telefonRegex = /^[0-9]+$/;
+
+            if (!this.adSoyad.trim()) {
+                this.hatalar.adSoyad = "Ad Soyad alanı boş bırakılamaz.";
+            }
+
+            if (!this.email.trim()) {
+                this.hatalar.email = "E-posta alanı boş bırakılamaz.";
+            } else if (!emailRegex.test(this.email)) {
+                this.hatalar.email = "Geçerli bir e-posta adresi giriniz.";
+            }
+
+            if (!this.telefon.trim()) {
+                this.hatalar.telefon = "Telefon alanı boş bırakılamaz.";
+            } else if (!telefonRegex.test(this.telefon)) {
+                this.hatalar.telefon = "Telefon sadece rakamlardan oluşmalıdır.";
+            }
+
+            if (!this.mesaj.trim()) {
+                this.hatalar.mesaj = "Mesaj alanı boş bırakılamaz.";
+            }
+
+            if (Object.keys(this.hatalar).length === 0) {
+                this.basarili = true;
+                
+                const data = {
+                    adSoyad: adSoyad,
+                    email: email,
+                    telefon: telefon,
+                    mesaj: mesaj
+                }
+                var request = new XMLHttpRequest();
+                request.open("POST", "form.php");
+                request.addEventListener('load', function(response) {
+                    console.log(response.currentTarget.response);
+                });
+                request.send(data);
+            }
+        }
+    }
+}).mount('#app');
+</script>
+
+</body>
+</html>
